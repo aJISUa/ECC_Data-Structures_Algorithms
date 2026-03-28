@@ -1,8 +1,10 @@
 // 뱀 - 골드4
 /* 문제
-'Dummy' 라는 도스게임이 있다. 이 게임에는 뱀이 나와서 기어다니는데, 사과를 먹으면 뱀 길이가 늘어난다. 뱀이 이리저리 기어다니다가 벽 또는 자기자신의 몸과 부딪히면 게임이 끝난다.
+'Dummy' 라는 도스게임이 있다. 이 게임에는 뱀이 나와서 기어다니는데, 사과를 먹으면 뱀 길이가 늘어난다.
+뱀이 이리저리 기어다니다가 벽 또는 자기자신의 몸과 부딪히면 게임이 끝난다.
 
-게임은 NxN 정사각 보드위에서 진행되고, 몇몇 칸에는 사과가 놓여져 있다. 보드의 상하좌우 끝에 벽이 있다. 게임이 시작할때 뱀은 맨위 맨좌측에 위치하고 뱀의 길이는 1 이다. 뱀은 처음에 오른쪽을 향한다.
+게임은 NxN 정사각 보드위에서 진행되고, 몇몇 칸에는 사과가 놓여져 있다. 보드의 상하좌우 끝에 벽이 있다.
+게임이 시작할때 뱀은 맨위 맨좌측에 위치하고 뱀의 길이는 1 이다. 뱀은 처음에 오른쪽을 향한다.
 
 뱀은 매 초마다 이동을 하는데 다음과 같은 규칙을 따른다.
 
@@ -14,14 +16,110 @@
 
 - 입력
 첫째 줄에 보드의 크기 N이 주어진다. (2 ≤ N ≤ 100) 다음 줄에 사과의 개수 K가 주어진다. (0 ≤ K ≤ 100)
-
 다음 K개의 줄에는 사과의 위치가 주어지는데, 첫 번째 정수는 행, 두 번째 정수는 열 위치를 의미한다. 사과의 위치는 모두 다르며, 맨 위 맨 좌측 (1행 1열) 에는 사과가 없다.
 
 다음 줄에는 뱀의 방향 변환 횟수 L 이 주어진다. (1 ≤ L ≤ 100)
-
-다음 L개의 줄에는 뱀의 방향 변환 정보가 주어지는데, 정수 X와 문자 C로 이루어져 있으며. 게임 시작 시간으로부터 X초가 끝난 뒤에 왼쪽(C가 'L') 또는 오른쪽(C가 'D')로 90도 방향을 회전시킨다는 뜻이다. X는 10,000 이하의 양의 정수이며, 방향 전환 정보는 X가 증가하는 순으로 주어진다.
+다음 L개의 줄에는 뱀의 방향 변환 정보가 주어지는데,
+정수 X와 문자 C로 이루어져 있으며. 게임 시작 시간으로부터 X초가 끝난 뒤에 왼쪽(C가 'L') 또는 오른쪽(C가 'D')로 90도 방향을 회전시킨다는 뜻이다.
+X는 10,000 이하의 양의 정수이며, 방향 전환 정보는 X가 증가하는 순으로 주어진다.
 
 - 출력
 첫째 줄에 게임이 몇 초에 끝나는지 출력한다.
 
 */
+
+#include <iostream>
+#include <deque>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, k;
+    cin >> n >> k;
+
+    // 2차원 행렬
+    // n 크기 1차원 vector를 n개 만들기
+    vector<vector<int>> board(n, vector<int>(n,0));
+
+    // 사과 위치
+    for (int i = 0; i < k; i++) {
+        int x, y;
+        cin >> x >> y;
+        board[x - 1][y - 1] = 2; // 사과
+    }
+
+    int l;
+    cin >> l;
+
+    map<int, char> turn;
+
+    for (int i = 0; i < l; i++) {
+        int t;
+        char c;
+        cin >> t >> c;
+        turn[t] = c;
+    }
+
+
+    // 방향: 동, 남, 서, 북
+    int dx[4] = {0, 1, 0, -1};
+    int dy[4] = {1, 0, -1, 0};
+    int dir = 0;
+
+    deque<pair<int, int>> snake;
+    snake.push_back({0, 0});
+    board[0][0] = 1;
+
+    int time = 0;
+    int x = 0, y = 0;
+
+    while (true) {
+        time++;
+
+        int nx = x + dx[dir];
+        int ny = y + dy[dir];
+
+        // 벽 또는 자기 몸 충돌
+        if (nx < 0 || ny < 0 || nx >= n || ny >= n || board[nx][ny] == 1) {
+            break;
+        }
+
+        // 사과가 있는 경우
+        if (board[nx][ny] == 2) {
+            board[nx][ny] = 1;
+            snake.push_front({nx, ny});
+        }
+        // 사과 없는 경우
+        else {
+            board[nx][ny] = 1;
+            snake.push_front({nx, ny});
+
+            auto tail = snake.back();
+            snake.pop_back();
+            board[tail.first][tail.second] = 0;
+        }
+
+        x = nx;
+        y = ny;
+
+        // 방향 전환
+        if (turn.count(time)) {
+            if (turn[time] == 'L') {
+                dir = (dir + 3) % 4;
+            } else if (turn[time] == 'D') {
+                dir = (dir + 1) % 4;
+            }
+        }
+    }
+
+    cout << time << "\n";
+
+    return 0;
+}
