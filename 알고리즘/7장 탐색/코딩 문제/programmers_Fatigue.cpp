@@ -18,7 +18,7 @@ dungeons의 각 행은 각 던전의 ["최소 필요 피로도", "소모 피로�
 #include <stdlib.h>
 
 static int visited[8]; // 던전 방문 여부
-static int max_count;
+static int max_count; // 최대 탐험한 던전 수
 
 // 던전 탐험을 시도하는 함수
 void explore(int fatigue, int depth, int** dungeons, size_t dungeons_rows) {
@@ -26,7 +26,7 @@ void explore(int fatigue, int depth, int** dungeons, size_t dungeons_rows) {
         max_count = depth;
     }
 
-    // 백트래킹
+    // 백트래킹: 모든 던전을 탐험해보면서 가능한 최대 탐험 수를 찾기
     for (size_t i = 0; i < dungeons_rows; i++) {
         if (!visited[i] && fatigue >= dungeons[i][0]) {
             visited[i] = 1;
@@ -36,7 +36,7 @@ void explore(int fatigue, int depth, int** dungeons, size_t dungeons_rows) {
     }
 }
 
-// dungeons_rows는 2차원 배열 dungeons의 행 길이, dungeons_cols는 2차원 배열 dungeons의 열 길이입니다.
+// dungeons_rows는 2차원 배열 dungeons의 행 길이, dungeons_cols는 2차원 배열 dungeons의 열 길이
 int solution(int k, int** dungeons, size_t dungeons_rows, size_t dungeons_cols) {
     // 정적 변수 초기화 (함수가 여러 번 호출될 경우를 대비)
     for (int i = 0; i < 8; i++) visited[i] = 0;
