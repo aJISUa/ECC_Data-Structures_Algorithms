@@ -36,6 +36,7 @@ CS고등학교에서는 지필 평가에서 10개의 과목을 평가한다.
 #include <iostream>
 using namespace std;
 
+// 막대그래프를 직접 배열에 저장하지 않고, 출력 시점에 조건 계산
 int main() {
     int score[10];
 
@@ -46,10 +47,10 @@ int main() {
 
     // 위에서부터 출력 (10층 ~ 1층)
     for (int level = 10; level >= 1; level--) {
-
         for (int i = 0; i < 10; i++) {
 
             // 현재 점수가 level*10 이상이면 #
+            // 해당 점수의 층 높이를 구해 현제 level과 비교
             if (score[i] / 10 >= level)
                 cout << "# ";
             else

@@ -15,6 +15,7 @@ vertex 배열 각 행 [a, b]는 a번 노드와 b번 노드 사이에 간선이 �
 
 using namespace std;
 
+// BFS로 사용한 이유: 최단 경로 문제에서 DFS는 모든 경로를 탐색하기 때문에 비효율적. 반면 BFS는 레벨별로 탐색하기 때문에 최단 경로를 보장하며, 가장 먼 노드의 레벨을 쉽게 계산할 수 있다.
 int solution(int n, vector<vector<int>> edge) {
     // 인접 리스트 구성(양방향)
     vector<vector<int>> graph(n + 1);
@@ -27,13 +28,15 @@ int solution(int n, vector<vector<int>> edge) {
     vector<int> dist(n + 1, -1);  // -1: 미방문
     queue<int> q;
     
-    dist[1] = 0;
-    q.push(1);
+    dist[1] = 0; // 1번 노드부터 시작
+    q.push(1); // BFS 시작
 
+    // BFS 탐색
     while (!q.empty()) {
         int cur = q.front();
         q.pop();
 
+        // 현재 노드의 이웃 노드 탐색
         for (int next : graph[cur]) {
             if (dist[next] == -1) { // 아직 방문하지 않은 노드
                 dist[next] = dist[cur] + 1; // 현재 거리 + 1
@@ -42,13 +45,13 @@ int solution(int n, vector<vector<int>> edge) {
         }
     }
 
+    // dist 배열을 두 번 순회해서, 최대값을 먼저 확정한 뒤 그 값과 같은 노드를 세는 방식으로 구현
     // 최대 거리 찾기
     int maxDist = 0;
     for (int i = 1; i <= n; i++) {
         if (dist[i] > maxDist) maxDist = dist[i];
     }
-
-    // 최대 거리와 같은 노드 개수 세기
+    // 최대 거리 확정 후, 최대 거리와 같은 노드 개수 세기
     int answer = 0;
     for (int i = 1; i <= n; i++) {
         if (dist[i] == maxDist) answer++;
